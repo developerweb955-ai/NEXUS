@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+uploads/*
+!uploads/.gitkeep
+reports/*
+!reports/.gitkeep
+
+# Local authentication data and secrets
+.nexus_secret_key
+nexus_users.db
