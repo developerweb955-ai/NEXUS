@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <title>NEXUS — Data Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" aria-label="NEXUS home">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span class="brand-name">NEXUS<span class="brand-dot">.</span><small>DATA INTELLIGENCE</small></span>
+      </a>
+
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">◫</span> Overview</button>
+        <button class="nav-item" data-view="dataset"><span class="nav-icon">▤</span> Dataset</button>
+        <button class="nav-item" data-view="inspection"><span class="nav-icon">⌕</span> Data inspection</button>
+        <button class="nav-item" data-view="cleaning"><span class="nav-icon">✣</span> Data cleaning</button>
+        <button class="nav-item" data-view="analytics"><span class="nav-icon">◷</span> Analytics</button>
+        <button class="nav-item" data-view="visualizations"><span class="nav-icon">▥</span> Visualizations</button>
+        <button class="nav-item" data-view="reports"><span class="nav-icon">▧</span> Reports</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="connection-card">
+          <span class="status-pulse"></span>
+          <div><strong>Backend connection</strong><small id="connection-label">Checking service…</small></div>
+        </div>
+        <div class="sidebar-foot">NEXUS <span>v1.0.0</span><br><small>Your Data. Your Insights. Your Decisions.</small></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobile-menu" aria-label="Toggle navigation">☰</button>
+        <div class="breadcrumb">Workspace <span>/</span> <strong id="breadcrumb-current">Overview</strong></div>
+        <div class="topbar-right">
+          <span class="topbar-status"><i></i> WORKSPACE READY</span>
+          <div class="topbar-menu-wrap">
+            <button class="icon-button notification-button" id="notification-button" type="button" aria-label="Notifications" aria-expanded="false" aria-controls="notification-panel">
+              <span aria-hidden="true">♧</span><i class="notification-dot hidden" id="notification-dot"></i>
+            </button>
+            <section class="topbar-popover notification-panel hidden" id="notification-panel" aria-label="Notifications">
+              <div class="popover-heading"><div><strong>Notifications</strong><small id="notification-count">You're all caught up</small></div><button class="text-button" id="mark-notifications-read" type="button">Mark all read</button></div>
+              <div class="notification-list" id="notification-list"><div class="notification-empty">No notifications yet.</div></div>
+            </section>
+          </div>
+          <div class="topbar-menu-wrap">
+            <button class="profile-button" id="profile-button" type="button" aria-label="Account menu" aria-expanded="false" aria-controls="profile-panel"><span class="avatar">N</span><span class="profile-copy"><strong>{{ user.name }}</strong><small>{{ user.email }}</small></span><span class="profile-chevron">⌄</span></button>
+            <section class="topbar-popover profile-panel hidden" id="profile-panel" aria-label="Account menu">
+              <div class="profile-summary"><span class="avatar">{{ user.name[:1]|upper }}</span><div><strong>{{ user.name }}</strong><small>{{ user.email }}</small></div></div>
+              <a class="profile-menu-item" href="{{ url_for('account_settings') }}">Account settings <span>Open →</span></a>
+              <form method="post" action="{{ url_for('logout') }}"><button class="profile-menu-item" type="submit">Sign out <span>↗</span></button></form>
+            </section>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-wrap">
+        <section class="view active" id="view-overview">
+          <div class="welcome-row">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-line"></span> INTELLIGENCE WORKSPACE</div>
+              <h1>Your data.<br><span class="gradient-text">In a clearer light.</span></h1>
+              <p class="lead">Explore, prepare and understand your data with one connected analysis workspace.</p>
+            </div>
+            <div class="welcome-orb" aria-hidden="true"><div class="orb-ring ring-one"></div><div class="orb-ring ring-two"></div><div class="orb-core">N</div></div>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-card"><div class="stat-top"><span>DATASET ROWS</span><span class="stat-symbol">▤</span></div><strong id="stat-rows">—</strong><small>Records currently loaded</small></article>
+            <article class="stat-card"><div class="stat-top"><span>COLUMNS</span><span class="stat-symbol">▥</span></div><strong id="stat-columns">—</strong><small>Variables in your dataset</small></article>
+            <article class="stat-card"><div class="stat-top"><span>PIPELINE STATUS</span><span class="stat-symbol">◉</span></div><strong class="stat-word" id="stat-pipeline">Standby</strong><small id="stat-pipeline-note">Waiting for a dataset</small></article>
+            <article class="stat-card accent-card"><div class="stat-top"><span>VISUALIZATIONS</span><span class="stat-symbol">⌁</span></div><strong id="stat-charts">0</strong><small>Charts generated</small></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel upload-panel">
+              <div class="panel-heading"><div><span class="section-kicker">GET STARTED</span><h2>Bring your data in</h2></div><span class="panel-icon">↥</span></div>
+              <p class="muted">Upload a CSV or Excel file to begin your analysis workflow.</p>
+              <label class="dropzone" id="dropzone" for="dataset-file">
+                <input id="dataset-file" type="file" accept=".csv,.xlsx,.xls">
+                <span class="upload-icon">↑</span>
+                <strong>Drop your dataset here</strong>
+                <span>or <u>browse files</u> from your computer</span>
+                <small>CSV, XLSX or XLS · Maximum 50 MB</small>
+              </label>
+              <div class="upload-progress hidden" id="upload-progress"><span></span></div>
+              <div class="file-message" id="upload-message" aria-live="polite">Your file stays in this local NEXUS workspace.</div>
+            </section>
+
+            <section class="panel pipeline-panel">
+              <div class="panel-heading"><div><span class="section-kicker">YOUR WORKFLOW</span><h2>Analysis pipeline</h2></div><span class="live-tag"><i></i> LIVE</span></div>
+              <div class="pipeline-list">
+                <div class="pipeline-step" data-step="dataset_loaded"><span class="step-number">01</span><span class="step-copy"><strong>Upload dataset</strong><small>Load a CSV or Excel file</small></span><span class="step-state">Waiting</span></div>
+                <div class="pipeline-step" data-step="dataset_inspected"><span class="step-number">02</span><span class="step-copy"><strong>Inspect data</strong><small>Understand structure and quality</small></span><span class="step-state">Waiting</span></div>
+                <div class="pipeline-step" data-step="dataset_cleaned"><span class="step-number">03</span><span class="step-copy"><strong>Clean data</strong><small>Prepare data for analysis</small></span><span class="step-state">Waiting</span></div>
+                <div class="pipeline-step" data-step="dataset_analyzed"><span class="step-number">04</span><span class="step-copy"><strong>Analyze patterns</strong><small>Statistics and useful findings</small></span><span class="step-state">Waiting</span></div>
+                <div class="pipeline-step" data-step="visualizations_created"><span class="step-number">05</span><span class="step-copy"><strong>Explore visuals</strong><small>Turn results into charts</small></span><span class="step-state">Waiting</span></div>
+              </div>
+            </section>
+          </div>
+
+          <section class="panel quick-panel">
+            <div class="panel-heading"><div><span class="section-kicker">QUICK ACCESS</span><h2>Continue your work</h2></div></div>
+            <div class="quick-actions">
+              <button class="quick-action" data-go="inspection"><span>⌕</span><strong>Inspect dataset</strong><small>Review columns and missing values</small><b>→</b></button>
+              <button class="quick-action" data-go="cleaning"><span>✣</span><strong>Clean dataset</strong><small>Remove duplicates and handle gaps</small><b>→</b></button>
+              <button class="quick-action" data-go="analytics"><span>◷</span><strong>Run analytics</strong><small>Explore statistical findings</small><b>→</b></button>
+              <button class="quick-action" data-go="reports"><span>▧</span><strong>Create report</strong><small>Generate a downloadable PDF</small><b>→</b></button>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="view-dataset">
+          <div class="page-heading"><div><div class="eyebrow">WORKSPACE / DATA</div><h1>Dataset <span class="gradient-text">workspace</span></h1><p class="lead">Your active dataset and a quick preview of its records.</p></div><button class="primary-button" id="dataset-upload-trigger">＋ Upload dataset</button></div>
+          <div class="panel table-panel">
+            <div class="panel-heading"><div><span class="section-kicker">ACTIVE DATASET</span><h2 id="dataset-name">No dataset loaded</h2></div><span class="neutral-tag" id="dataset-shape">No data</span></div>
+            <div class="empty-state" id="dataset-empty"><span>▤</span><strong>Your workspace is ready</strong><p>Upload a CSV or Excel file to see a preview here.</p></div>
+            <div class="table-wrap hidden" id="preview-wrap"><table class="data-table" id="preview-table"></table></div>
+          </div>
+        </section>
+
+        <section class="view" id="view-inspection">
+          <div class="page-heading"><div><div class="eyebrow">DATA QUALITY</div><h1>Data <span class="gradient-text">inspection</span></h1><p class="lead">Understand dimensions, column types, missing values and duplicates.</p></div><button class="primary-button" id="inspect-button">Run inspection ↗</button></div>
+          <div class="result-grid" id="inspection-results"><div class="panel empty-state wide-empty"><span>⌕</span><strong>No inspection results yet</strong><p>Upload a dataset, then run inspection.</p></div></div>
+        </section>
+
+        <section class="view" id="view-cleaning">
+          <div class="page-heading"><div><div class="eyebrow">DATA PREPARATION</div><h1>Data <span class="gradient-text">cleaning</span></h1><p class="lead">Choose the cleaning operations you want to apply to the active dataset.</p></div></div>
+          <div class="clean-layout">
+            <section class="panel">
+              <div class="panel-heading"><div><span class="section-kicker">CLEANING OPERATIONS</span><h2>Prepare your dataset</h2></div></div>
+              <label class="operation-option"><input type="checkbox" id="clean-duplicates" checked><span><strong>Remove duplicate rows</strong><small>Keep the first occurrence of each identical row.</small></span></label>
+              <label class="operation-option"><input type="checkbox" id="clean-whitespace"><span><strong>Trim text whitespace</strong><small>Remove leading and trailing spaces from text columns.</small></span></label>
+              <label class="operation-option"><input type="checkbox" id="clean-missing"><span><strong>Drop rows with missing values</strong><small>Remove rows containing missing values in any column.</small></span></label>
+              <div class="notice">Cleaning starts from the originally uploaded dataset each time. Review your choices before applying them.</div>
+              <button class="primary-button full-button" id="clean-button">Apply selected operations ↗</button>
+            </section>
+            <section class="panel">
+              <div class="panel-heading"><div><span class="section-kicker">CLEANING SUMMARY</span><h2>Latest result</h2></div></div>
+              <div id="cleaning-summary" class="empty-state compact-empty"><span>✣</span><strong>No cleaning applied</strong><p>Your cleaning history will appear here.</p></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-analytics">
+          <div class="page-heading"><div><div class="eyebrow">DISCOVER PATTERNS</div><h1>Data <span class="gradient-text">analytics</span></h1><p class="lead">Statistical summaries and analytical findings from your active dataset.</p></div><button class="primary-button" id="analyze-button">Run analysis ↗</button></div>
+          <div id="analytics-results" class="result-grid"><div class="panel empty-state wide-empty"><span>◷</span><strong>Analysis is waiting</strong><p>Upload a dataset and run analytics to view results.</p></div></div>
+        </section>
+
+        <section class="view" id="view-visualizations">
+          <div class="page-heading"><div><div class="eyebrow">VISUAL DATA STORIES</div><h1>Data <span class="gradient-text">visualizations</span></h1><p class="lead">Explore charts generated from your active dataset.</p></div><button class="primary-button" id="charts-button">Generate charts ↗</button></div>
+          <div id="charts-grid" class="charts-grid"><div class="panel empty-state wide-empty"><span>▥</span><strong>No charts generated</strong><p>Generate visualizations after uploading a dataset.</p></div></div>
+        </section>
+
+        <section class="view" id="view-reports">
+          <div class="page-heading"><div><div class="eyebrow">EXPORT & SHARE</div><h1>Analysis <span class="gradient-text">reports</span></h1><p class="lead">Create a PDF report containing your dataset profile and analytical findings.</p></div><button class="primary-button" id="report-button">Generate PDF report ↗</button></div>
+          <section class="panel report-panel"><div class="report-art">PDF</div><div><span class="section-kicker">NEXUS REPORT ENGINE</span><h2>Your analysis, documented.</h2><p class="muted">Generate a PDF report from the currently loaded dataset. NEXUS will prepare inspection and analytics results when needed.</p><div id="report-message" class="file-message">No report generated in this session.</div><a id="report-download" class="primary-button hidden" href="#" target="_blank" rel="noopener">↓ Download PDF report</a></div></section>
+        </section>
+
+        <footer class="footer"><span>© 2026 NEXUS DATA INTELLIGENCE</span><span>Your Data. Your Insights. Your Decisions.</span></footer>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <div class="busy-overlay hidden" id="busy-overlay"><div class="busy-box"><div class="spinner"></div><strong id="busy-title">Working on your data…</strong><small id="busy-subtitle">Please wait while NEXUS processes your request.</small></div></div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
