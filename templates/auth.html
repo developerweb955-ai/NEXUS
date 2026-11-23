@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff"><title>{{ 'Create account' if mode == 'register' else 'Sign in' }} — NEXUS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <a class="auth-brand" href="{{ url_for('login') }}"><span class="auth-mark"><i></i><i></i><i></i></span><span>NEXUS<small>DATA INTELLIGENCE</small></span></a>
+    <section class="auth-card">
+      <div class="auth-eyebrow">YOUR DATA. YOUR INSIGHTS.</div>
+      <h1>{{ 'Create your account' if mode == 'register' else 'Welcome back' }}</h1>
+      <p>{{ 'Register to create your private NEXUS workspace.' if mode == 'register' else 'Sign in to continue to your NEXUS workspace.' }}</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="auth-alert {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+      <form method="post" class="auth-form">
+        {% if mode == 'register' %}<label>Full name<input type="text" name="name" autocomplete="name" maxlength="80" required></label>{% endif %}
+        <label>Email address<input type="email" name="email" autocomplete="email" required></label>
+        <label>Password<input type="password" name="password" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" minlength="8" required></label>
+        {% if mode == 'register' %}<label>Confirm password<input type="password" name="confirm_password" autocomplete="new-password" minlength="8" required></label>{% endif %}
+        <button type="submit" class="auth-submit">{{ 'Create account' if mode == 'register' else 'Sign in' }} <span>→</span></button>
+      </form>
+      <div class="auth-switch">{% if mode == 'register' %}Already have an account? <a href="{{ url_for('login') }}">Sign in</a>{% else %}New to NEXUS? <a href="{{ url_for('register') }}">Create an account</a>{% endif %}</div>
+    </section>
+    <div class="auth-foot">NEXUS <span>·</span> A private data intelligence workspace</div>
+  </main>
+</body>
+</html>
